@@ -24,7 +24,7 @@ def get_account_by_guess(from_user, description, time=None):
             else:
                 return value
             break
-    return "Expenses:Unknown"
+    return "Expenses:Life:其他"
 
 
 def get_income_account_by_guess(from_user, description, time=None):
@@ -68,6 +68,10 @@ class DictReaderStrip(csv.DictReader):
         d = dict(zip(self.fieldnames, row))
         lf = len(self.fieldnames)
         lr = len(row)
+        # print("start")
+        # print(self.fieldnames)
+        # print(row)
+        # print("test"+ str(lf)+"tst"+str(lr))
         if lf < lr:
             d[self.restkey] = row[lf:].strip()
         elif lf > lr:

@@ -16,6 +16,9 @@ from modules.imports.icbc_debit import ICBCDebit
 from modules.imports.wechat import WeChat
 from modules.imports.yuebao import YuEBao
 from modules.imports.alipay_prove import AlipayProve
+from modules.imports.wacaiOut import WaCaiOut
+from modules.imports.wacaiIn import WaCaiIn
+from modules.imports.wacaiSw import WaCaiSw
 
 parser = argparse.ArgumentParser("import")
 parser.add_argument("path", help="CSV Path")
@@ -26,7 +29,7 @@ args = parser.parse_args()
 
 entries, errors, option_map = loader.load_file(args.entry)
 
-importers = [Alipay, AlipayProve, WeChat, CITICCredit, CMBCCredit,
+importers = [Alipay, AlipayProve, WeChat, WaCaiOut,WaCaiIn,WaCaiSw, CITICCredit, CMBCCredit,
              CMBCredit, YuEBao, ICBCCredit, ICBCDebit]#, CCBDebit]
 instance = None
 for importer in importers:

@@ -15,10 +15,11 @@ from . import (DictReaderStrip, get_account_by_guess,
 from .base import Base
 from .deduplicate import Deduplicate
 
-Account零钱通 = 'Assets:Company:WeChat:Lingqiantong'
-Account收入红包 = 'Income:RedBag'
-Account支出红包 = 'Expenses:RedBag'
-Account余额 = 'Assets:Balances:WeChat'
+Account零钱通 = 'Assets:Flow:EBank:光的微信'
+Account工商银行 = 'Assets:Flow:Bank:光工商银行'
+Account收入红包 = 'Income:Life:红包'
+Account支出红包 = 'Expenses:Life:Other:红包'
+Account余额 = 'Assets:Flow:EBank:光的微信'
 
 
 class WeChat(Base):
@@ -38,6 +39,9 @@ class WeChat(Base):
 
         print('Import WeChat: ' + lines[2])
         content = "\n".join(lines[16:len(lines)])
+        print('aa')
+        # print('hhaa'+content)
+        print('bb')
         self.content = content
         self.deduplicate = Deduplicate(entries, option_map)
 
@@ -46,8 +50,12 @@ class WeChat(Base):
         f = StringIO(content)
         reader = DictReaderStrip(f, delimiter=',')
         transactions = []
+        i=0
         for row in reader:
-            print("Importing {} at {}".format(row['商品'], row['交易时间']))
+            if i == 0:
+                print(str(row)) 
+            i = i+1
+            # print("Importing {} at {}".format(row['商品'], row['交易时间']))
             meta = {}
             time = dateparser.parse(row['交易时间'])
             meta['wechat_trade_no'] = row['交易单号']
@@ -82,9 +90,14 @@ class WeChat(Base):
             status = row['当前状态']
 
             if status == '支付成功' or status == '朋友已收钱' or status == '已全额退款' or '已退款' in status or status == '已转账' or status == '充值成功':
-                if '转入零钱通' in row['交易类型']:
+                if '零钱' in row['交易类型']:
                     entry = entry._replace(payee='')
-                    entry = entry._replace(narration='转入零钱通')
+                    entry = entry._replace(narration='零钱花费')
+                    data.create_simple_posting(
+                        entry, Account零钱通, amount_string, 'CNY')
+                elif '工商银行(4794)' in row['交易类型']:
+                    entry = entry._replace(payee='')
+                    entry = entry._replace(narration='工商银行')
                     data.create_simple_posting(
                         entry, Account零钱通, amount_string, 'CNY')
                 else:
